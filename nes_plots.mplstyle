@@ -12,13 +12,13 @@ figure.subplot.right      : 0.95
 figure.subplot.bottom     : 0.18
 figure.subplot.top        : 0.92
 
-axes.titlesize            : small
-axes.labelsize            : large
+axes.titlesize            : 12
+axes.labelsize            : 14
 axes.formatter.limits     : -2,4
 
 legend.frameon            : False
 legend.numpoints          : 1
-legend.fontsize           : small
+legend.fontsize           : 12
 
 lines.linewidth           : 1.0
 
