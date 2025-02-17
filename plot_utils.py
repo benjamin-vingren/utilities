@@ -99,7 +99,7 @@ def random_colors(size=1, seed=0):
     return colors
 
 
-def multipage(filename, figs=None, dpi=200, check=True, tight_layout=True):
+def multipage(filename, figs=None, dpi=200, check=True, combine_pdf=False):
     '''
     Saves all open figures to a PDF.
     '''
@@ -110,15 +110,22 @@ def multipage(filename, figs=None, dpi=200, check=True, tight_layout=True):
                 return 0
             else:
                 print('Overwriting file.')
-    pp = PdfPages(filename)
+
     if figs is None:
         figs = [plt.figure(n) for n in plt.get_fignums()]
-    for fig in figs:
-        if tight_layout:
+    
+    if not combine_pdf:
+        for i, fig in enumerate(figs):
+            pp = PdfPages(f'{filename}_{i}.pdf')
             fig.savefig(pp, format='pdf', bbox_inches='tight', pad_inches=0)
-        else:
-            fig.savefig(pp, format='pdf')
-    pp.close()
+            pp.close()
+    else:
+        pp = PdfPages(filename)
+    
+        for fig in figs:
+            fig.savefig(pp, format='pdf', bbox_inches='tight', pad_inches=0)
+        pp.close()
+    
 
 
 def get_markers(n):
@@ -194,7 +201,7 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log):
     contour = plt.contourf(Xi, Yi, Zi, levels=c_levels, cmap='viridis', 
                            norm=norm)
 
-    plt.colorbar(label='$f(x_1, x_2)$')
+    plt.colorbar(label='$f_{EB}(x_1, x_2)$')
     plt.xlabel('$x_1$')
     plt.ylabel('$x_2$')
         
