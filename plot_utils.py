@@ -145,7 +145,7 @@ def set_nes_plot_style():
     plt.style.use(filename)
     
 
-def plot_contour(x1, x2, obj_fcn, title, c_levels, log):
+def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name=''):
     """
     Plot contour and scatter plots for x1 and x2 with their evaluated objective
     function.
@@ -163,8 +163,8 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log):
     obj_fcn : numpy.ndarray
         Array of the evaluated values f(x1, x2).
     title : str
-        Title for the plots. This is typically a string that helps identify the
-        dataset.
+        Figure title for the plots. This is typically a string that helps
+        identify the dataset.
     c_levels : numpy.ndarray
         Array of contour levels to be used in the contour plot.
     log : bool
@@ -184,7 +184,7 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log):
         norm = None
     plt.figure(f'Scatter {title}')
     scatter = plt.scatter(x1, x2, c=obj_fcn, s=0.5, norm=norm)
-    plt.colorbar(scatter, label='$f(x_1, x_2)$')
+    plt.colorbar(scatter, label=f'$f_{{{f_name}}}(x_1, x_2)$')
     plt.xlabel('$x_1$')
     plt.ylabel('$x_2$')
     
@@ -201,7 +201,7 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log):
     contour = plt.contourf(Xi, Yi, Zi, levels=c_levels, cmap='viridis', 
                            norm=norm)
 
-    plt.colorbar(label='$f_{EB}(x_1, x_2)$')
+    plt.colorbar(label=f'$f_{{{f_name}}}(x_1, x_2)$')
     plt.xlabel('$x_1$')
     plt.ylabel('$x_2$')
         
