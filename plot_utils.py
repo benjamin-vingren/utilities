@@ -211,5 +211,74 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name=''):
 
     return contour, scatter
 
+
+def plot_matrix(matrix, bin_edges=None, log=False, xlabel=None, ylabel=None,
+                colorbar_label=None, vmin=None, vmax=None):
+    """
+    Plot a 2D matrix as a color-coded heatmap using histogram binning.
+    
+    Parameters
+    ----------
+    matrix : array_like
+        2D array to be visualized as a heatmap.
+    bin_edges : tuple of array_like, optional
+        A tuple containing two arrays representing the bin edges for the x and
+        y axes, respectively. If None, uniform bin edges are generated based
+        on the matrix shape.
+    log : bool, default=False
+        If True, applies logarithmic normalization to the color scale.
+    xlabel : str, optional
+        Label for the x-axis.
+    ylabel : str, optional
+        Label for the y-axis.
+    colorbar_label : str, optional
+        Label for the colorbar.
+    vmin : float, optional
+        Minimum value for colormap normalization. Overrides default behavior.
+    vmax : float, optional
+        Maximum value for colormap normalization. Overrides default behavior.
+    
+    Returns
+    -------
+    hist2d : tuple
+        A tuple containing the histogram output from
+        `matplotlib.pyplot.hist2d`.
+    """
+    
+    plt.figure()
+    if bin_edges is None:
+        x_bin_edges = np.arange(0, np.shape(matrix)[0] + 1)
+        y_bin_edges = np.arange(0, np.shape(matrix)[1] + 1)
+    else:
+        x_bin_edges = bin_edges[0]
+        y_bin_edges = bin_edges[1]
+
+    x_bin_centres = x_bin_edges[1:] - np.diff(x_bin_edges) / 2
+    y_bin_centres = y_bin_edges[1:] - np.diff(y_bin_edges) / 2
+
+    # Create fill for x and y
+    x_repeated = np.tile(x_bin_centres, len(y_bin_centres))
+    y_repeated = np.repeat(y_bin_centres, len(x_bin_centres))
+    weights = np.ndarray.flatten(np.transpose(matrix))
+
+    # Set white background
+    my_cmap = plt.cm.jet
+    my_cmap.set_under('w', 1)
+
+    if log:
+        normed = matplotlib.colors.LogNorm(vmin=1)
+    else:
+        normed = None
+        
+    # Create 2D histogram using weights
+    hist2d = plt.hist2d(x_repeated, y_repeated, bins=(x_bin_edges, y_bin_edges),
+                        weights=weights, cmap=my_cmap, norm=normed, vmin=vmin,
+                        vmax=vmax)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.colorbar(label=colorbar_label)
+    
+    return hist2d
+
 if __name__ == '__main__':
     set_nes_plot_style()
