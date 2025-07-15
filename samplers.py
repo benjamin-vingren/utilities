@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def get_sobol_samples(bounds, num_samples, seed=None):
+def get_sobol_samples(bounds, num_samples, seed=None, is_integer=None):
     """
     Generate Sobol samples within specified bounds.
 
@@ -53,10 +53,33 @@ def get_sobol_samples(bounds, num_samples, seed=None):
     samples = sampler.random(num_samples)
     
     # Convert samples to values within bounds provided by user
-    l_bounds = [bound[0] for bound in bounds.values()]
-    u_bounds = [bound[1] for bound in bounds.values()]
+    l_bounds = np.array([bound[0] for bound in bounds.values()])
+    u_bounds = np.array([bound[1] for bound in bounds.values()])
     samples = qmc.scale(samples, l_bounds, u_bounds)
     
+    # Round if integer values
+    if is_integer is not None:
+        # Check if bound is integer
+        if (isinstance(l_bounds[is_integer], int) or
+            isinstance(u_bounds[is_integer], int)):
+            warnings.warn(
+                'For integer bounds the boundaries need to be selected '
+                'carefully to ensure that the edges are sampled at the same '
+                'frequency as the centre. E.g., for a parameter ranging '
+                'between 1-10 in integer steps, the boundaries should be set '
+                'to [0.5, 10.5]. This is due to the sampler sampling '
+                'non-integer values and then rounding them to the nearest '
+                'integer.')
+
+        samples.T[is_integer] = np.round(samples.T[is_integer])
+
+        # Check if any duplicates
+        unique, indices = np.unique(samples, axis=1, return_index=True)
+        if len(unique) != num_samples:
+            raise ValueError('Duplicate samples. Implement a fix for this.')
+            # TODO: Deal with duplicate samples.
+                
+        
     sobol_samples = {name: x_n for name, x_n in zip(bounds.keys(), samples.T)}
     return sobol_samples
 
