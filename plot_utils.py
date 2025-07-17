@@ -213,7 +213,7 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name=''):
 
 
 def plot_matrix(matrix, bin_edges=None, log=False, xlabel=None, ylabel=None,
-                colorbar_label=None, vmin=None, vmax=None):
+                colorbar_label=None, vmin=None, vmax=None, title=None):
     """
     Plot a 2D matrix as a color-coded heatmap using histogram binning.
     
@@ -277,6 +277,7 @@ def plot_matrix(matrix, bin_edges=None, log=False, xlabel=None, ylabel=None,
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.colorbar(label=colorbar_label)
+    plt.title(title)
     
     return hist2d
 
