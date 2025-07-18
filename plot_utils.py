@@ -99,7 +99,7 @@ def random_colors(size=1, seed=0):
     return colors
 
 
-def multipage(filename, figs=None, dpi=200, check=True, combine_pdf=False):
+def multipage(filename, figs=None, check=True, combine_pdf=False):
     '''
     Saves all open figures to a PDF.
     '''
@@ -126,6 +126,23 @@ def multipage(filename, figs=None, dpi=200, check=True, combine_pdf=False):
             fig.savefig(pp, format='pdf', bbox_inches='tight', pad_inches=0)
         pp.close()
     
+    
+def multiPNG(filename, dpi=400, check=True):
+    '''
+    Saves all open figures to PNG.
+    '''
+    if check:
+        if os.path.exists(filename):
+            inp = input(f'Overwrite {filename}? [y/n] ')
+            if inp != 'y':
+                return 0
+            else:
+                print('Overwriting file.')
+
+    for i, fignum in enumerate(plt.get_fignums(), start=1):
+        fig = plt.figure(fignum)
+        fig.savefig(f'{filename}_{i}.png', dpi=dpi, bbox_inches='tight',
+                    pad_inches=0)
 
 
 def get_markers(n):
