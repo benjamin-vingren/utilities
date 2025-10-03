@@ -155,10 +155,13 @@ def get_markers(n):
     return markers[0:n]
 
 
-def set_nes_plot_style():
+def set_nes_plot_style(large_font=False):
     matplotlib.rcParams['interactive'] = True
     dirname = os.path.dirname(__file__)
-    filename = os.path.join(dirname, 'nes_plots.mplstyle')
+    if large_font:
+        filename = os.path.join(dirname, 'nes_plots_large.mplstyle')
+    else:
+        filename = os.path.join(dirname, 'nes_plots.mplstyle')
     plt.style.use(filename)
     
 

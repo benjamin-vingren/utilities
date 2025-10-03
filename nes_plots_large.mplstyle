@@ -1,0 +1,27 @@
+font.family        : times new roman
+font.serif         : times new roman
+font.sans-serif    : times new roman
+
+mathtext.default   : regular
+font.size          : 16.0
+
+figure.facecolor          : white
+figure.figsize            : 4.85,3.7
+figure.subplot.left       : 0.18
+figure.subplot.right      : 0.95
+figure.subplot.bottom     : 0.18
+figure.subplot.top        : 0.92
+
+axes.titlesize            : 16
+axes.labelsize            : 18
+axes.formatter.limits     : -2,4
+
+legend.frameon            : False
+legend.numpoints          : 1
+legend.fontsize           : 16
+
+lines.linewidth           : 1.0
+
+xtick.minor.visible       : True
+
+errorbar.capsize          : 1.5
