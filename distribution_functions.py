@@ -160,7 +160,57 @@ def eggbox_loglikelihood(theta_1, theta_2):
     f = np.exp(2 + np.cos(theta_1 / 2) * np.cos(theta_2 / 2))**5
     
     return np.log(f)
+
+
+def ishigami(x1=None, x2=None, x3=None, a=7, b=0.1):
+    """
+    Computes the value of the Ishigami function, a standard benchmark function 
+    widely used in sensitivity analysis and uncertainty quantification.
+
+    The Ishigami function is defined as:
     
+        f(x1, x2, x3) = sin(x1) + a * sin(x2)^2 + b * x3 * sin(x1)
+
+    where x1, x2, x3 ∈ [-π, π].
+
+    Parameters
+    ----------
+    x1 : float or array-like, optional
+        The first input variable. If None, defaults to the range [-π, π].
+    x2 : float or array-like, optional
+        The second input variable. If None, defaults to the range [-π, π].
+    x3 : float or array-like, optional
+        The third input variable. If None, defaults to the range [-π, π].
+    a : float, optional, default=7
+        Coefficient controlling the nonlinearity of the second term.
+    b : float, optional, default=0.1
+        Coefficient controlling the interaction between x1 and x3.
+
+    Returns
+    -------
+    float or ndarray
+        The computed value of the Ishigami function for the given inputs.
+
+    Notes
+    -----
+    - The Ishigami function is notable for its strong nonlinearity and 
+      non-monotonicity, making it a challenging test case for sensitivity 
+      analysis.
+    - Commonly used parameter values are a = 7 and b = 0.1.
+    - The function is defined in a three-dimensional input space with each 
+      variable sampled in the interval [-π, π].
+    - The Ishigami function is particularly known for demonstrating 
+      non-additive interactions between variables.
+    """    
+    if x1 is None:
+        x1 = np.array([-np.pi, np.pi])
+    if x2 is None:
+        x2 = np.array([-np.pi, np.pi])
+    if x3 is None:
+        x3 = np.array([-np.pi, np.pi])        
+        
+    f = np.sin(x1) + a * np.sin(x2)**2 + b * x3 * np.sin(x1)
     
+    return f
 
     
