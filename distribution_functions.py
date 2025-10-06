@@ -162,7 +162,7 @@ def eggbox_loglikelihood(theta_1, theta_2):
     return np.log(f)
 
 
-def ishigami(x1=None, x2=None, x3=None, a=7, b=0.1):
+def ishigami(x_1, x_2, x_3, a=7, b=0.1):
     """
     Computes the value of the Ishigami function, a standard benchmark function 
     widely used in sensitivity analysis and uncertainty quantification.
@@ -176,11 +176,11 @@ def ishigami(x1=None, x2=None, x3=None, a=7, b=0.1):
     Parameters
     ----------
     x1 : float or array-like, optional
-        The first input variable. If None, defaults to the range [-π, π].
+        The first input variable. 
     x2 : float or array-like, optional
-        The second input variable. If None, defaults to the range [-π, π].
+        The second input variable.
     x3 : float or array-like, optional
-        The third input variable. If None, defaults to the range [-π, π].
+        The third input variable. 
     a : float, optional, default=7
         Coefficient controlling the nonlinearity of the second term.
     b : float, optional, default=0.1
@@ -202,15 +202,7 @@ def ishigami(x1=None, x2=None, x3=None, a=7, b=0.1):
     - The Ishigami function is particularly known for demonstrating 
       non-additive interactions between variables.
     """    
-    if x1 is None:
-        x1 = np.array([-np.pi, np.pi])
-    if x2 is None:
-        x2 = np.array([-np.pi, np.pi])
-    if x3 is None:
-        x3 = np.array([-np.pi, np.pi])        
-        
-    f = np.sin(x1) + a * np.sin(x2)**2 + b * x3 * np.sin(x1)
-    
+    f = np.sin(x_1) + a * np.sin(x_2)**2 + b * x_3**4 * np.sin(x_1)
     return f
 
     
