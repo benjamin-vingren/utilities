@@ -165,7 +165,8 @@ def set_nes_plot_style(large_font=False):
     plt.style.use(filename)
     
 
-def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name=''):
+def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name='',
+                 vmin=None, vmax=None):
     """
     Plot contour and scatter plots for x1 and x2 with their evaluated objective
     function.
@@ -219,7 +220,7 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name=''):
     # Contour plot
     plt.figure(f'Contour {title}', figsize=(8, 6))
     contour = plt.contourf(Xi, Yi, Zi, levels=c_levels, cmap='viridis', 
-                           norm=norm)
+                           norm=norm, vmin=vmin, vmax=vmax)
 
     plt.colorbar(label=f'$f_{{{f_name}}}(x_1, x_2)$')
     plt.xlabel('$x_1$')
