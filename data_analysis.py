@@ -74,3 +74,27 @@ def running_average(a, n):
     std = np.concatenate((start_std, mid_std, end_std))
 
     return average, std
+
+
+def get_bin_centres(bin_edges):
+    """
+    Compute the center positions of histogram bins from bin edges.
+
+    Parameters
+    ----------
+    bin_edges : array_like
+        A one-dimensional array of monotonically increasing bin edge values.
+        The length of `bin_edges` must be one greater than the number of bins.
+
+    Returns
+    -------
+    bin_centres : ndarray
+        A one-dimensional array containing the center position of each bin,
+        with length ``len(bin_edges) - 1``.
+
+    Notes
+    -----
+    This function assumes uniform bin widths and computes the bin centers
+    by subtracting half of the bin width from the upper bin edges.
+    """
+    return bin_edges[1:] - np.diff(bin_edges)[0] / 2
