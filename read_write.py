@@ -20,7 +20,7 @@ def json_write_dictionary(file_name, to_save, check=True):
                 print('File was not overwritten.')
                 return 0
     with open(file_name, 'w') as handle:
-        json.dump(to_save, handle)
+        json.dump(to_save, handle, indent=2)
 
 
 def json_read_dictionary(file_name):
