@@ -13,6 +13,7 @@ import matplotlib
 import os
 from scipy.interpolate import griddata
 import matplotlib.colors as colors
+import locale
 
 
 def get_linestyle(ls):
@@ -155,13 +156,20 @@ def get_markers(n):
     return markers[0:n]
 
 
-def set_nes_plot_style(large_font=False):
+def set_nes_plot_style(large_font=False, swedish=False):
     matplotlib.rcParams['interactive'] = True
     dirname = os.path.dirname(__file__)
-    if large_font:
+    if large_font and swedish:
+        locale.setlocale(locale.LC_ALL, "sv_SE.UTF-8")
+        filename = os.path.join(dirname, 'nes_plots_swedish_large.mplstyle')
+    elif large_font:
         filename = os.path.join(dirname, 'nes_plots_large.mplstyle')
+    elif swedish:
+        locale.setlocale(locale.LC_ALL, "sv_SE.UTF-8")
+        filename = os.path.join(dirname, 'nes_plots_swedish.mplstyle')
     else:
         filename = os.path.join(dirname, 'nes_plots.mplstyle')
+        
     plt.style.use(filename)
     
 
