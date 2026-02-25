@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def get_sobol_samples(bounds, num_samples, seed=None, is_integer=None):
+def get_sobol_samples(bounds, num_samples, seed=None, is_integer=None,
+                      return_dict=True):
     """
     Generate Sobol samples within specified bounds.
 
@@ -29,6 +30,11 @@ def get_sobol_samples(bounds, num_samples, seed=None, is_integer=None):
     seed : int or None, optional
         Seed for the Sobol sequence generator. If 'None', the seed is not set.
         Default is 'None'.
+    is_integer : list of bools, optional
+        Parameter with a True boolean in is_integer is rounded to an integer
+        value.
+    return_dict : bool, optional
+        Returns numpy arrays if False, otherwise dictionaries.
 
     Returns
     -------
@@ -45,18 +51,18 @@ def get_sobol_samples(bounds, num_samples, seed=None, is_integer=None):
     >>> samples
     {'x1': array([ 1.46544212,  9.42368189,  3.46797881, ...]),
      'x2': array([12.21551958,  4.67114914,  8.96751457, ...])}
-    """    
+    """
     # Select Sobol sampler
     sampler = qmc.Sobol(len(bounds), seed=seed)
-    
+
     # Sample num_samples between [0, 1)
     samples = sampler.random(num_samples)
-    
+
     # Convert samples to values within bounds provided by user
     l_bounds = np.array([bound[0] for bound in bounds.values()])
     u_bounds = np.array([bound[1] for bound in bounds.values()])
     samples = qmc.scale(samples, l_bounds, u_bounds)
-    
+
     # Round if integer values
     if is_integer is not None:
         # Check if bound is integer
@@ -78,8 +84,10 @@ def get_sobol_samples(bounds, num_samples, seed=None, is_integer=None):
         if len(unique) != num_samples:
             raise ValueError('Duplicate samples. Implement a fix for this.')
             # TODO: Deal with duplicate samples.
-                
-        
+
+    if not return_dict:
+        return samples
+
     sobol_samples = {name: x_n for name, x_n in zip(bounds.keys(), samples.T)}
     return sobol_samples
 
@@ -110,14 +118,15 @@ def get_grid_samples(parameters):
     """
     # Create the grid
     grid = np.meshgrid(*parameters)
-    
+
     # Return flattened arrays
     flat_grid = [p.flatten() for p in grid]
-    
+
     return flat_grid
-    
-    
-def get_latin_hypercube_samples(bounds, num_samples, seed=None):
+
+
+def get_latin_hypercube_samples(bounds, num_samples, seed=None,
+                                return_dict=True):
     """
     Generate Latin Hypercube samples within specified bounds.
 
@@ -131,7 +140,8 @@ def get_latin_hypercube_samples(bounds, num_samples, seed=None):
         The number of samples to generate (n_samples should be a power of 2).
     seed : int or None, optional
         Seed for the LHS generator. If 'None', the seed is not set.
-
+    return_dict : bool, optional
+        Returns numpy arrays if False, otherwise dictionaries. Default is True.
     Returns
     -------
     lh_samples : dict
@@ -145,23 +155,27 @@ def get_latin_hypercube_samples(bounds, num_samples, seed=None):
     {'x1': array([0.153, 0.534, 0.876, ...]),
      'x2': array([7.234, 6.581, 9.124, ...])}
     """
-    
+
     # Select latin hypercube sampler
     sampler = qmc.LatinHypercube(len(bounds), seed=seed)
-    
+
     # Sample num_samples between [0, 1)
     samples = sampler.random(num_samples)
-    
+
     # Convert samples to values within bounds provided by user
     l_bounds = [bound[0] for bound in bounds.values()]
     u_bounds = [bound[1] for bound in bounds.values()]
     samples = qmc.scale(samples, l_bounds, u_bounds)
-    
+
+
+    if not return_dict:
+        return samples
+
     lh_samples = {name: x_n for name, x_n in zip(bounds.keys(), samples.T)}
     return lh_samples
 
 
-def get_random_samples(bounds, num_samples, seed=None):
+def get_random_samples(bounds, num_samples, seed=None, return_dict=True):
     """
     Generate random samples within specified bounds.
 
@@ -178,7 +192,8 @@ def get_random_samples(bounds, num_samples, seed=None):
         The number of samples to generate.
     seed : int or None, optional
         Seed for the random number generator. If 'None', the seed is not set.
-
+    return_dict : bool, optional
+        Returns numpy arrays if False, otherwise dictionaries.
     Returns
     -------
     rand_samples : dict
@@ -195,19 +210,21 @@ def get_random_samples(bounds, num_samples, seed=None):
     # Select random sampler
     rng = np.random.default_rng(seed)
     samples = rng.random([num_samples, len(bounds)])
-    
+
     # Convert samples to values within bounds provided by user
     l_bounds = [bound[0] for bound in bounds.values()]
     u_bounds = [bound[1] for bound in bounds.values()]
     samples = qmc.scale(samples, l_bounds, u_bounds)
-    
+
     rand_samples = {name: x_n for name, x_n in zip(bounds.keys(), samples.T)}
+
+    if not return_dict:
+        return np.array(list(rand_samples.values()))
+
     return rand_samples
 
 
 if __name__ == '__main__':
-    pass
-    
-    
-    
-    
+    samples = get_latin_hypercube_samples({'x_1': [0, 1], 'x_2': [0, 1]}, 1024, return_dict=False)
+    print(samples)
+    # pass
