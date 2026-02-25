@@ -64,7 +64,7 @@ def get_linestyle(ls):
 
 
         raise Exception(f'Unknown linestyle: {ls}')
-        
+
 
 def get_colors(n_colors):
     colors_list = ['k']
@@ -114,7 +114,7 @@ def multipage(filename, figs=None, check=True, combine_pdf=False):
 
     if figs is None:
         figs = [plt.figure(n) for n in plt.get_fignums()]
-    
+
     if not combine_pdf:
         for i, fig in enumerate(figs):
             pp = PdfPages(f'{filename}_{i}.pdf')
@@ -122,12 +122,12 @@ def multipage(filename, figs=None, check=True, combine_pdf=False):
             pp.close()
     else:
         pp = PdfPages(filename)
-    
+
         for fig in figs:
             fig.savefig(pp, format='pdf', bbox_inches='tight', pad_inches=0)
         pp.close()
-    
-    
+
+
 def multiPNG(filename, dpi=400, check=True):
     '''
     Saves all open figures to PNG.
@@ -169,9 +169,9 @@ def set_nes_plot_style(large_font=False, swedish=False):
         filename = os.path.join(dirname, 'nes_plots_swedish.mplstyle')
     else:
         filename = os.path.join(dirname, 'nes_plots.mplstyle')
-        
+
     plt.style.use(filename)
-    
+
 
 def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name='',
                  vmin=None, vmax=None):
@@ -181,7 +181,7 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name='',
 
     This function generates a contour plot and a scatter plot to visualize the
     relationship between x1 and x2 and their corresponding evaluated objective
-    function. 
+    function.
 
     Parameters
     ----------
@@ -216,24 +216,24 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name='',
     plt.colorbar(scatter, label=f'$f_{{{f_name}}}(x_1, x_2)$')
     plt.xlabel('$x_1$')
     plt.ylabel('$x_2$')
-    
+
     # Create grid coordinates
     xi = np.linspace(x1.min(), x1.max(), 50)
     yi = np.linspace(x2.min(), x2.max(), 50)
     Xi, Yi = np.meshgrid(xi, yi)
-    
+
     # Interpolate z values on the grid
     Zi = griddata((x1, x2), obj_fcn, (Xi, Yi), method='cubic')
 
     # Contour plot
     plt.figure(f'Contour {title}', figsize=(8, 6))
-    contour = plt.contourf(Xi, Yi, Zi, levels=c_levels, cmap='viridis', 
+    contour = plt.contourf(Xi, Yi, Zi, levels=c_levels, cmap='viridis',
                            norm=norm, vmin=vmin, vmax=vmax)
 
     plt.colorbar(label=f'$f_{{{f_name}}}(x_1, x_2)$')
     plt.xlabel('$x_1$')
     plt.ylabel('$x_2$')
-        
+
     # Move exponential to the left
     t = plt.gca().yaxis.get_offset_text()
     t.set_x(-0.18)
@@ -245,7 +245,7 @@ def plot_matrix(matrix, bin_edges=None, log=False, xlabel=None, ylabel=None,
                 colorbar_label=None, vmin=None, vmax=None, title=None):
     """
     Plot a 2D matrix as a color-coded heatmap using histogram binning.
-    
+
     Parameters
     ----------
     matrix : array_like
@@ -266,14 +266,14 @@ def plot_matrix(matrix, bin_edges=None, log=False, xlabel=None, ylabel=None,
         Minimum value for colormap normalization. Overrides default behavior.
     vmax : float, optional
         Maximum value for colormap normalization. Overrides default behavior.
-    
+
     Returns
     -------
     hist2d : tuple
         A tuple containing the histogram output from
         `matplotlib.pyplot.hist2d`.
     """
-    
+
     plt.figure()
     if bin_edges is None:
         x_bin_edges = np.arange(0, np.shape(matrix)[0] + 1)
@@ -298,7 +298,7 @@ def plot_matrix(matrix, bin_edges=None, log=False, xlabel=None, ylabel=None,
         normed = matplotlib.colors.LogNorm(vmin=1)
     else:
         normed = None
-        
+
     # Create 2D histogram using weights
     hist2d = plt.hist2d(x_repeated, y_repeated, bins=(x_bin_edges, y_bin_edges),
                         weights=weights, cmap=my_cmap, norm=normed, vmin=vmin,
@@ -307,7 +307,72 @@ def plot_matrix(matrix, bin_edges=None, log=False, xlabel=None, ylabel=None,
     plt.ylabel(ylabel)
     plt.colorbar(label=colorbar_label)
     plt.title(title)
-    
+
+    return hist2d
+
+
+def plot_heatmap(x, y, z, bin_edges_x, bin_edges_y, xlabel, ylabel,
+                 colorbar_label, vmin=0, vmax=1, title=None):
+    """
+    Plot a 2D heatmap of mean z-values binned over x and y.
+
+    The function computes the mean of ``z`` within each 2D bin defined by
+    ``bin_edges_x`` and ``bin_edges_y`` and visualizes the result as a heatmap.
+
+    Parameters
+    ----------
+    x : array_like
+        One-dimensional array of x-coordinates.
+    y : array_like
+        One-dimensional array of y-coordinates.
+    z : array_like
+        One-dimensional array of values associated with each (x, y) pair.
+        Must have the same length as ``x`` and ``y``.
+    bin_edges_x : array_like
+        Bin edge definitions along the x-axis.
+    bin_edges_y : array_like
+        Bin edge definitions along the y-axis.
+    xlabel : str
+        Label for the x-axis.
+    ylabel : str
+        Label for the y-axis.
+    colorbar_label : str
+        Label for the colorbar representing the binned ``z`` values.
+    vmin : float, optional
+        Minimum value for the colormap normalization. Default is 0.
+    vmax : float, optional
+        Maximum value for the colormap normalization. Default is 1.
+    title : str or None, optional
+        Title of the plot. If ``None``, no title is displayed.
+
+    Returns
+    -------
+    hist2d : object
+        The heatmap object returned by ``plot_matrix()``.
+
+    Notes
+    -----
+    - Bins that contain no data points will result in ``NaN`` values due to
+      the mean computation.
+    - Bin intervals are defined as ``(bin_edges[i], bin_edges[i + 1]]``.
+    """
+    # Loop over x
+    bin_values = np.zeros([len(bin_edges_x) - 1, len(bin_edges_y) - 1])
+    for i in range(len(bin_edges_x) - 1):
+        mask_x = (x > bin_edges_x[i]) & (x <= bin_edges_x[i + 1])
+
+        # Loop over y
+        for j in range(len(bin_edges_y) - 1):
+            mask_y = (y > bin_edges_y[j]) & (y <= bin_edges_y[j + 1])
+
+            # z mean value for bin
+            bin_values[i, j] = z[mask_x & mask_y].mean()
+
+    hist2d = pu.plot_matrix(bin_values, xlabel=xlabel, ylabel=ylabel,
+                            colorbar_label=colorbar_label,
+                            bin_edges=[bin_edges_x, bin_edges_y],
+                            vmin=vmin, vmax=vmax, title=title)
+
     return hist2d
 
 if __name__ == '__main__':
