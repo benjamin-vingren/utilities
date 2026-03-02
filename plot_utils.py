@@ -368,10 +368,10 @@ def plot_heatmap(x, y, z, bin_edges_x, bin_edges_y, xlabel, ylabel,
             # z mean value for bin
             bin_values[i, j] = z[mask_x & mask_y].mean()
 
-    hist2d = pu.plot_matrix(bin_values, xlabel=xlabel, ylabel=ylabel,
-                            colorbar_label=colorbar_label,
-                            bin_edges=[bin_edges_x, bin_edges_y],
-                            vmin=vmin, vmax=vmax, title=title)
+    hist2d = plot_matrix(bin_values, xlabel=xlabel, ylabel=ylabel,
+                        colorbar_label=colorbar_label,
+                        bin_edges=[bin_edges_x, bin_edges_y],
+                        vmin=vmin, vmax=vmax, title=title)
 
     return hist2d
 
