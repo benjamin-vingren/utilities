@@ -11,7 +11,9 @@ import numpy as np
 import warnings
 
 
-def get_sobol_samples(bounds, num_samples, seed=None, is_integer=None):
+def get_sobol_samples(
+    bounds, num_samples, seed=None, is_integer=None, return_dict=True
+):
     """
     Generate Sobol samples within specified bounds.
 
@@ -30,9 +32,11 @@ def get_sobol_samples(bounds, num_samples, seed=None, is_integer=None):
     seed : int or None, optional
         Seed for the Sobol sequence generator. If 'None', the seed is not set.
         Default is 'None'.
-    is_integer : list of bool, optional
-        List containing booleans with the same size as the number of dimensions. Rounds
-        the samples to integer values if True.
+    is_integer : list of bools, optional
+        Parameter with a True boolean in is_integer is rounded to an integer
+        value.
+    return_dict : bool, optional
+        Returns numpy arrays if False, otherwise dictionaries.
 
     Returns
     -------
@@ -85,6 +89,9 @@ def get_sobol_samples(bounds, num_samples, seed=None, is_integer=None):
             raise ValueError("Duplicate samples. Implement a fix for this.")
             # TODO: Deal with duplicate samples.
 
+    if not return_dict:
+        return samples
+
     sobol_samples = {name: x_n for name, x_n in zip(bounds.keys(), samples.T)}
     return sobol_samples
 
@@ -122,7 +129,7 @@ def get_grid_samples(parameters):
     return flat_grid
 
 
-def get_latin_hypercube_samples(bounds, num_samples, seed=None):
+def get_latin_hypercube_samples(bounds, num_samples, seed=None, return_dict=True):
     """
     Generate Latin Hypercube samples within specified bounds.
 
@@ -136,7 +143,8 @@ def get_latin_hypercube_samples(bounds, num_samples, seed=None):
         The number of samples to generate (n_samples should be a power of 2).
     seed : int or None, optional
         Seed for the LHS generator. If 'None', the seed is not set.
-
+    return_dict : bool, optional
+        Returns numpy arrays if False, otherwise dictionaries. Default is True.
     Returns
     -------
     lh_samples : dict
@@ -162,11 +170,14 @@ def get_latin_hypercube_samples(bounds, num_samples, seed=None):
     u_bounds = [bound[1] for bound in bounds.values()]
     samples = qmc.scale(samples, l_bounds, u_bounds)
 
+    if not return_dict:
+        return samples
+
     lh_samples = {name: x_n for name, x_n in zip(bounds.keys(), samples.T)}
     return lh_samples
 
 
-def get_random_samples(bounds, num_samples, seed=None):
+def get_random_samples(bounds, num_samples, seed=None, return_dict=True):
     """
     Generate random samples within specified bounds.
 
@@ -183,7 +194,8 @@ def get_random_samples(bounds, num_samples, seed=None):
         The number of samples to generate.
     seed : int or None, optional
         Seed for the random number generator. If 'None', the seed is not set.
-
+    return_dict : bool, optional
+        Returns numpy arrays if False, otherwise dictionaries.
     Returns
     -------
     rand_samples : dict
@@ -207,6 +219,10 @@ def get_random_samples(bounds, num_samples, seed=None):
     samples = qmc.scale(samples, l_bounds, u_bounds)
 
     rand_samples = {name: x_n for name, x_n in zip(bounds.keys(), samples.T)}
+
+    if not return_dict:
+        return np.array(list(rand_samples.values()))
+
     return rand_samples
 
 
