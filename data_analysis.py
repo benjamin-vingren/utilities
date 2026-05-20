@@ -37,6 +37,9 @@ def running_average(a, n):
     - The middle part of the array, where the running average and standard
       deviation are computed over a window of length '2n+1'.
     """
+    if np.any(np.isnan(a)):
+        raise ValueError("Array may not contain NaN.")
+
     # Beginning/end part of list
     start_of_list = np.empty([n, 2 * n])
     start_of_list[:] = np.nan
@@ -46,8 +49,8 @@ def running_average(a, n):
 
     for i in range(n):
         # Choose beginning/end of list
-        start_of_list[i][0:i + n + 1] = a[0:i + n + 1]
-        end_of_list[i][-2 * n + i:] = a[-2 * n + i:]
+        start_of_list[i][0 : i + n + 1] = a[0 : i + n + 1]
+        end_of_list[i][-2 * n + i :] = a[-2 * n + i :]
 
     # Calculate average
     start_average = np.nanmean(start_of_list, axis=1)
@@ -61,7 +64,7 @@ def running_average(a, n):
     mid_of_list = np.zeros([len(a) - 2 * n, 2 * n + 1])
     for i in range(len(a) - 2 * n):
         # Choose middle part of list
-        mid_of_list[i] = a[i:2 * n + i + 1]
+        mid_of_list[i] = a[i : 2 * n + i + 1]
 
     # Calculate average
     mid_average = np.mean(mid_of_list, axis=1)
