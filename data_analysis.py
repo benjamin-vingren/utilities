@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Thu Dec  5 15:23:12 2024
 
@@ -39,6 +38,10 @@ def running_average(a, n):
     """
     if np.any(np.isnan(a)):
         raise ValueError("Array may not contain NaN.")
+    if 2 * n >= len(a):
+        raise ValueError(
+            f"n={n} is too large for array of length {len(a)}; require 2*n < len(a)."
+        )
 
     # Beginning/end part of list
     start_of_list = np.empty([n, 2 * n])
