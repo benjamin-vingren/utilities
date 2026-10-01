@@ -1,73 +1,72 @@
-# -*- coding: utf-8 -*-
 """
 Created on Wed Oct 23 14:29:06 2024
 
 @author: benjer
 """
 
+import locale
+import os
+
+import matplotlib
+import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.colors as mcolors
+from matplotlib import colors
 from matplotlib.backends.backend_pdf import PdfPages
-import matplotlib
-import os
 from scipy.interpolate import griddata
-import matplotlib.colors as colors
-import locale
 
 
 def get_linestyle(ls):
-    if ls == 'dash-dot-dotted':
+    if ls == "dash-dot-dotted":
         return (0, (3, 5, 1, 5, 1, 5))
-    elif ls == 'loosely dotted':
+    elif ls == "loosely dotted":
         return (0, (1, 10))
-    elif ls == 'dotted':
+    elif ls == "dotted":
         return (0, (1, 2))
-    elif ls == 'densely dotted':
+    elif ls == "densely dotted":
         return (0, (1, 1))
-    elif ls == 'long dash with offset':
+    elif ls == "long dash with offset":
         return (5, (10, 3))
-    elif ls == 'loosely dashed':
+    elif ls == "loosely dashed":
         return (0, (5, 10))
-    elif ls == 'dashed':
+    elif ls == "dashed":
         return (0, (5, 5))
-    elif ls == 'densely dashed':
+    elif ls == "densely dashed":
         return (0, (5, 1))
-    elif ls == 'loosely dashdotted':
+    elif ls == "loosely dashdotted":
         return (0, (3, 10, 1, 10))
-    elif ls == 'dashdotted':
+    elif ls == "dashdotted":
         return (0, (3, 5, 1, 5))
-    elif ls == 'densely dashdotted':
+    elif ls == "densely dashdotted":
         return (0, (3, 1, 1, 1))
-    elif ls == 'dashdotdotted':
+    elif ls == "dashdotdotted":
         return (0, (3, 5, 1, 5, 1, 5))
-    elif ls == 'loosely dashdotdotted':
+    elif ls == "loosely dashdotdotted":
         return (0, (3, 10, 1, 10, 1, 10))
-    elif ls == 'densely dashdotdotted':
+    elif ls == "densely dashdotdotted":
         return (0, (3, 1, 1, 1, 1, 1))
 
     else:
-        print('Available linestyles:')
-        print('loosely dotted')
-        print('dotted')
-        print('densely dotted')
-        print('long dash with offset')
-        print('loosely dashed')
-        print('dashed')
-        print('densely dashed')
-        print('loosely dashdotted')
-        print('dashdotted')
-        print('densely dashdotted')
-        print('dashdotdotted')
-        print('loosely dashdotdotted')
-        print('densely dashdotdotted')
+        print("Available linestyles:")
+        print("loosely dotted")
+        print("dotted")
+        print("densely dotted")
+        print("long dash with offset")
+        print("loosely dashed")
+        print("dashed")
+        print("densely dashed")
+        print("loosely dashdotted")
+        print("dashdotted")
+        print("densely dashdotted")
+        print("dashdotdotted")
+        print("loosely dashdotdotted")
+        print("densely dashdotdotted")
 
-
-        raise Exception(f'Unknown linestyle: {ls}')
+        raise Exception(f"Unknown linestyle: {ls}")
 
 
 def get_colors(n_colors):
-    colors_list = ['k']
+    colors_list = ["k"]
     for c in mcolors.TABLEAU_COLORS:
         colors_list.append(c)
 
@@ -75,14 +74,29 @@ def get_colors(n_colors):
         colors_list.append(c)
 
     # Remove whites
-    white = ['whitesmoke', 'white', 'snow', 'mistyrose', 'seashell', 'linen',
-             'oldlace', 'floralwhite', 'ivory', 'lightyellow', 'honeydew',
-             'mintcream', 'azure', 'aliceblue', 'ghostwhite', 'lavenderblush']
+    white = [
+        "whitesmoke",
+        "white",
+        "snow",
+        "mistyrose",
+        "seashell",
+        "linen",
+        "oldlace",
+        "floralwhite",
+        "ivory",
+        "lightyellow",
+        "honeydew",
+        "mintcream",
+        "azure",
+        "aliceblue",
+        "ghostwhite",
+        "lavenderblush",
+    ]
     for w in white:
         colors_list.remove(w)
 
     if n_colors > len(colors_list):
-        print('Not enough colors in list, returning random colors.')
+        print("Not enough colors in list, returning random colors.")
         return random_colors(n_colors)
     return colors_list[:n_colors]
 
@@ -91,90 +105,133 @@ def random_colors(size=1, seed=0):
     if seed:
         np.random.seed(seed)
     if size == 1:
-        colors = [np.random.uniform(0, 1), np.random.uniform(
-            0, 1), np.random.uniform(0, 1)]
+        colors = [
+            np.random.uniform(0, 1),
+            np.random.uniform(0, 1),
+            np.random.uniform(0, 1),
+        ]
     else:
-        colors = [[np.random.uniform(0, 1), np.random.uniform(
-            0, 1), np.random.uniform(0, 1)] for i in range(size)]
+        colors = [
+            [np.random.uniform(0, 1), np.random.uniform(0, 1), np.random.uniform(0, 1)]
+            for i in range(size)
+        ]
 
     return colors
 
 
 def multipage(filename, figs=None, check=True, combine_pdf=False):
-    '''
+    """
     Saves all open figures to a PDF.
-    '''
+    """
     if check:
         if os.path.exists(filename):
-            inp = input(f'Overwrite {filename}? [y/n] ')
-            if inp != 'y':
+            inp = input(f"Overwrite {filename}? [y/n] ")
+            if inp != "y":
                 return 0
             else:
-                print('Overwriting file.')
+                print("Overwriting file.")
 
     if figs is None:
         figs = [plt.figure(n) for n in plt.get_fignums()]
 
     if not combine_pdf:
         for i, fig in enumerate(figs):
-            pp = PdfPages(f'{filename}_{i}.pdf')
-            fig.savefig(pp, format='pdf', bbox_inches='tight', pad_inches=0)
+            pp = PdfPages(f"{filename}_{i}.pdf")
+            fig.savefig(pp, format="pdf", bbox_inches="tight", pad_inches=0)
             pp.close()
     else:
         pp = PdfPages(filename)
 
         for fig in figs:
-            fig.savefig(pp, format='pdf', bbox_inches='tight', pad_inches=0)
+            fig.savefig(pp, format="pdf", bbox_inches="tight", pad_inches=0)
         pp.close()
 
 
 def multiPNG(filename, dpi=400, check=True):
-    '''
+    """
     Saves all open figures to PNG.
-    '''
+    """
     if check:
         if os.path.exists(filename):
-            inp = input(f'Overwrite {filename}? [y/n] ')
-            if inp != 'y':
+            inp = input(f"Overwrite {filename}? [y/n] ")
+            if inp != "y":
                 return 0
             else:
-                print('Overwriting file.')
+                print("Overwriting file.")
 
     for i, fignum in enumerate(plt.get_fignums(), start=1):
         fig = plt.figure(fignum)
-        fig.savefig(f'{filename}_{i}.png', dpi=dpi, bbox_inches='tight',
-                    pad_inches=0)
+        fig.savefig(f"{filename}_{i}.png", dpi=dpi, bbox_inches="tight", pad_inches=0)
 
 
 def get_markers(n):
     """Return a number of markers"""
-    markers = np.array(['.', '+', 'x', 'v', '^', '<', '>', '1', '2', '3', '4', 's', 'p',
-                        '*', 'D', 'd', '|', '_', 'P', 'X'])
+    markers = np.array(
+        [
+            ".",
+            "+",
+            "x",
+            "v",
+            "^",
+            "<",
+            ">",
+            "1",
+            "2",
+            "3",
+            "4",
+            "s",
+            "p",
+            "*",
+            "D",
+            "d",
+            "|",
+            "_",
+            "P",
+            "X",
+        ]
+    )
     if n > len(markers):
-        raise ValueError(
-            f'Not enough unique markers, max(n) = {len(markers)}.')
+        raise ValueError(f"Not enough unique markers, max(n) = {len(markers)}.")
     return markers[0:n]
 
 
-def set_nes_plot_style(large_font=False, swedish=False):
-    matplotlib.rcParams['interactive'] = True
-    dirname = os.path.dirname(__file__)
-    if large_font and swedish:
+_SIZE_SUFFIXES = {
+    None: "",
+    "large": "_large",
+    "larger": "_larger",
+    "huge": "_huge",
+}
+
+
+def set_nes_plot_style(size=None, swedish=False):
+    """Apply an NES matplotlib style.
+
+    Args:
+        size: One of None, "large", "larger", "huge".
+        swedish: If True, use the Swedish-locale variant and set
+            LC_ALL to sv_SE.UTF-8.
+    """
+    if size not in _SIZE_SUFFIXES:
+        raise ValueError(f"size must be one of {list(_SIZE_SUFFIXES)}, got {size!r}")
+
+    matplotlib.rcParams["interactive"] = True
+
+    if swedish:
         locale.setlocale(locale.LC_ALL, "sv_SE.UTF-8")
-        filename = os.path.join(dirname, 'nes_plots_swedish_large.mplstyle')
-    elif large_font:
-        filename = os.path.join(dirname, 'nes_plots_large.mplstyle')
-    elif swedish:
-        locale.setlocale(locale.LC_ALL, "sv_SE.UTF-8")
-        filename = os.path.join(dirname, 'nes_plots_swedish.mplstyle')
-    else:
-        filename = os.path.join(dirname, 'nes_plots.mplstyle')
+
+    lang_part = "_swedish" if swedish else ""
+    size_part = _SIZE_SUFFIXES[size]
+    filename = os.path.join(
+        os.path.dirname(__file__),
+        f"mpl_styles/nes_plots{lang_part}{size_part}.mplstyle",
+    )
 
     plt.style.use(filename)
 
 
-def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name='',
-                 vmin=None, vmax=None):
+def plot_contour(
+    x1, x2, obj_fcn, title, c_levels, log, f_name="", vmin=None, vmax=None
+):
     """
     Plot contour and scatter plots for x1 and x2 with their evaluated objective
     function.
@@ -211,11 +268,11 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name='',
         norm = colors.LogNorm()
     else:
         norm = None
-    plt.figure(f'Scatter {title}')
+    plt.figure(f"Scatter {title}")
     scatter = plt.scatter(x1, x2, c=obj_fcn, s=0.5, norm=norm)
-    plt.colorbar(scatter, label=f'$f_{{{f_name}}}(x_1, x_2)$')
-    plt.xlabel('$x_1$')
-    plt.ylabel('$x_2$')
+    plt.colorbar(scatter, label=f"$f_{{{f_name}}}(x_1, x_2)$")
+    plt.xlabel("$x_1$")
+    plt.ylabel("$x_2$")
 
     # Create grid coordinates
     xi = np.linspace(x1.min(), x1.max(), 50)
@@ -223,16 +280,17 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name='',
     Xi, Yi = np.meshgrid(xi, yi)
 
     # Interpolate z values on the grid
-    Zi = griddata((x1, x2), obj_fcn, (Xi, Yi), method='cubic')
+    Zi = griddata((x1, x2), obj_fcn, (Xi, Yi), method="cubic")
 
     # Contour plot
-    plt.figure(f'Contour {title}', figsize=(8, 6))
-    contour = plt.contourf(Xi, Yi, Zi, levels=c_levels, cmap='viridis',
-                           norm=norm, vmin=vmin, vmax=vmax)
+    plt.figure(f"Contour {title}", figsize=(8, 6))
+    contour = plt.contourf(
+        Xi, Yi, Zi, levels=c_levels, cmap="viridis", norm=norm, vmin=vmin, vmax=vmax
+    )
 
-    plt.colorbar(label=f'$f_{{{f_name}}}(x_1, x_2)$')
-    plt.xlabel('$x_1$')
-    plt.ylabel('$x_2$')
+    plt.colorbar(label=f"$f_{{{f_name}}}(x_1, x_2)$")
+    plt.xlabel("$x_1$")
+    plt.ylabel("$x_2$")
 
     # Move exponential to the left
     t = plt.gca().yaxis.get_offset_text()
@@ -241,8 +299,17 @@ def plot_contour(x1, x2, obj_fcn, title, c_levels, log, f_name='',
     return contour, scatter
 
 
-def plot_matrix(matrix, bin_edges=None, log=False, xlabel=None, ylabel=None,
-                colorbar_label=None, vmin=None, vmax=None, title=None):
+def plot_matrix(
+    matrix,
+    bin_edges=None,
+    log=False,
+    xlabel=None,
+    ylabel=None,
+    colorbar_label=None,
+    vmin=None,
+    vmax=None,
+    title=None,
+):
     """
     Plot a 2D matrix as a color-coded heatmap using histogram binning.
 
@@ -292,7 +359,7 @@ def plot_matrix(matrix, bin_edges=None, log=False, xlabel=None, ylabel=None,
 
     # Set white background
     my_cmap = plt.cm.jet
-    my_cmap.set_under('w', 1)
+    my_cmap.set_under("w", 1)
 
     if log:
         normed = matplotlib.colors.LogNorm(vmin=1)
@@ -300,19 +367,37 @@ def plot_matrix(matrix, bin_edges=None, log=False, xlabel=None, ylabel=None,
         normed = None
 
     # Create 2D histogram using weights
-    hist2d = plt.hist2d(x_repeated, y_repeated, bins=(x_bin_edges, y_bin_edges),
-                        weights=weights, cmap=my_cmap, norm=normed, vmin=vmin,
-                        vmax=vmax)
+    hist2d = plt.hist2d(
+        x_repeated,
+        y_repeated,
+        bins=(x_bin_edges, y_bin_edges),
+        weights=weights,
+        cmap=my_cmap,
+        norm=normed,
+        vmin=vmin,
+        vmax=vmax,
+    )
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.colorbar(label=colorbar_label)
-    plt.title(title)
+    plt.title(title, loc="left")
 
     return hist2d
 
 
-def plot_heatmap(x, y, z, bin_edges_x, bin_edges_y, xlabel, ylabel,
-                 colorbar_label, vmin=0, vmax=1, title=None):
+def plot_heatmap(
+    x,
+    y,
+    z,
+    bin_edges_x,
+    bin_edges_y,
+    xlabel,
+    ylabel,
+    colorbar_label,
+    vmin=0,
+    vmax=1,
+    title=None,
+):
     """
     Plot a 2D heatmap of mean z-values binned over x and y.
 
@@ -368,12 +453,19 @@ def plot_heatmap(x, y, z, bin_edges_x, bin_edges_y, xlabel, ylabel,
             # z mean value for bin
             bin_values[i, j] = z[mask_x & mask_y].mean()
 
-    hist2d = plot_matrix(bin_values, xlabel=xlabel, ylabel=ylabel,
-                        colorbar_label=colorbar_label,
-                        bin_edges=[bin_edges_x, bin_edges_y],
-                        vmin=vmin, vmax=vmax, title=title)
+    hist2d = plot_matrix(
+        bin_values,
+        xlabel=xlabel,
+        ylabel=ylabel,
+        colorbar_label=colorbar_label,
+        bin_edges=[bin_edges_x, bin_edges_y],
+        vmin=vmin,
+        vmax=vmax,
+        title=title,
+    )
 
     return hist2d
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     set_nes_plot_style()
